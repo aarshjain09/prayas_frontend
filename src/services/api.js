@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:5000/api"
+  baseURL: "https://vijay-ba-git-main-aarshjain09s-projects.vercel.app/api"
 });
 
 // ✅ Attach token WITHOUT touching Content-Type
