@@ -22,39 +22,53 @@ export default function AdminProducts() {
     loadProducts();
   }, []);
 
-  // ✅ ADD PRODUCT (INITIAL STOCK)
+  /* ================================
+     ADD PRODUCT (WITH IMAGE)
+  ================================ */
   const addProduct = async () => {
-    const formData = new FormData();
+    try {
+      const formData = new FormData();
 
-    formData.append("name", form.name);
-    formData.append("pricePerPiece", Number(form.pricePerPiece));
-    formData.append("piecesPerBox", Number(form.piecesPerBox));
-    formData.append("stockBoxes", Number(form.stockBoxes || 0));
-    formData.append("stockPieces", Number(form.stockPieces || 0));
-    if (image) formData.append("image", image);
+      formData.append("name", form.name);
+      formData.append("pricePerPiece", form.pricePerPiece);
+      formData.append("piecesPerBox", form.piecesPerBox);
+      formData.append("stockBoxes", form.stockBoxes || 0);
+      formData.append("stockPieces", form.stockPieces || 0);
 
-    await API.post("/products", formData, {
-      headers: { "Content-Type": "multipart/form-data" }
-    });
+      if (image) {
+        formData.append("image", image); // 🔑 MUST be "image"
+      }
 
-    setForm({
-      name: "",
-      pricePerPiece: "",
-      piecesPerBox: "",
-      stockBoxes: "",
-      stockPieces: ""
-    });
-    setImage(null);
-    loadProducts();
+      // ❌ DO NOT set Content-Type manually
+      await API.post("/products", formData);
+
+      setForm({
+        name: "",
+        pricePerPiece: "",
+        piecesPerBox: "",
+        stockBoxes: "",
+        stockPieces: ""
+      });
+      setImage(null);
+
+      loadProducts();
+    } catch (err) {
+      console.error("Add product error:", err.response?.data || err.message);
+      alert(err.response?.data?.message || "Failed to add product");
+    }
   };
 
-  // ✅ UPDATE PRICE / PCS PER BOX ONLY
+  /* ================================
+     UPDATE PRODUCT (PRICE / PCS)
+  ================================ */
   const updateProduct = async (id, data) => {
     await API.put(`/products/${id}`, data);
     loadProducts();
   };
 
-  // ✅ ADD NEW STOCK (CORRECT WAY)
+  /* ================================
+     ADD STOCK
+  ================================ */
   const addStock = async (id, data) => {
     await API.put(`/products/${id}/add-stock`, data);
     loadProducts();
@@ -63,6 +77,7 @@ export default function AdminProducts() {
   return (
     <div className="max-w-7xl mx-auto px-4 py-6">
       <Adminnav />
+
       <h1 className="text-xl font-bold mb-4">Manage Products</h1>
 
       {/* ADD PRODUCT */}
@@ -147,7 +162,6 @@ export default function AdminProducts() {
               <tr key={p._id}>
                 <td className="border-t px-3 py-2">{p.name}</td>
 
-                {/* PRICE */}
                 <td className="border-t px-3 py-2">
                   <input
                     type="number"
@@ -161,7 +175,6 @@ export default function AdminProducts() {
                   />
                 </td>
 
-                {/* PCS / BOX */}
                 <td className="border-t px-3 py-2">
                   <input
                     type="number"
@@ -179,7 +192,6 @@ export default function AdminProducts() {
                   ₹{p.boxPrice}
                 </td>
 
-                {/* ✅ EDITABLE STOCK (ADD STOCK) */}
                 <td className="border-t px-3 py-2 text-sm">
                   <div className="mb-1">
                     <strong>{p.stockBoxes}</strong> boxes

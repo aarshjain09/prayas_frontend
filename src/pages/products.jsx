@@ -33,8 +33,7 @@ export default function Products() {
             {/* IMAGE */}
             {p.image && (
               <img
-                src={`http://localhost:5000${p.image}`}
-                alt={p.name}
+                src={p.image} alt={p.name}
                 className="w-full h-40 object-cover mb-3 rounded"
               />
             )}
