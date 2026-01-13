@@ -7,7 +7,7 @@ export default function CartItem({ item, onUpdate }) {
     <div className="border p-4 rounded space-y-2">
        {product.image && (
         <img
-          src={`http://localhost:5000${product.image}`}
+          src={`https://vijay-ba-git-main-aarshjain09s-projects.vercel.app/${product.image}`}
           alt={product.name}
           className="w-20 h-20 object-cover rounded border"
         />
