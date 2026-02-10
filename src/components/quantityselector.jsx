@@ -5,22 +5,15 @@ export default function QuantitySelector({ value, onChange }) {
   };
 
   const handleInput = (e) => {
-    const val = e.target.value;
-    if (val === "") {
-      onChange(0);
-      return;
-    }
-    const num = Number(val);
-    if (!isNaN(num) && num >= 0) {
-      onChange(num);
-    }
+    const num = Number(e.target.value);
+    if (!isNaN(num) && num >= 0) onChange(num);
   };
 
   return (
-    <div className="flex items-center gap-2">
+    <div className="flex items-center gap-1 sm:gap-2">
       <button
         onClick={decrease}
-        className="px-3 py-1 bg-gray-200 rounded text-lg"
+        className="px-2 sm:px-3 py-1 bg-gray-200 rounded text-sm"
       >
         −
       </button>
@@ -29,12 +22,12 @@ export default function QuantitySelector({ value, onChange }) {
         type="number"
         value={value}
         onChange={handleInput}
-        className="w-14 text-center border rounded"
+        className="w-10 sm:w-14 text-center border rounded text-sm"
       />
 
       <button
         onClick={increase}
-        className="px-3 py-1 bg-gray-200 rounded text-lg"
+        className="px-2 sm:px-3 py-1 bg-gray-200 rounded text-sm"
       >
         +
       </button>
