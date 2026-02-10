@@ -34,8 +34,11 @@ export default function Navbar() {
           {/* CUSTOMER NAV */}
           {user.role === "shopkeeper" && (
             <>
+              <NavLink to="/home" className={linkClass}>
+                Home
+              </NavLink>
               <NavLink to="/products" className={linkClass}>
-                Products
+                All Products
               </NavLink>
 
               <NavLink to="/orders" className={linkClass}>

@@ -20,7 +20,7 @@ export default function Login() {
       if (user.role === "admin") {
         navigate("/admin", { replace: true });
       } else {
-        navigate("/products", { replace: true });
+        navigate("/home", { replace: true });
       }
     }
   }, [user, navigate]);

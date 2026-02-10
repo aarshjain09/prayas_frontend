@@ -4,8 +4,11 @@ import Adminnav from "../../components/adminnav";
 
 export default function AdminProducts() {
   const [products, setProducts] = useState([]);
+  const [companies, setCompanies] = useState([]);
   const [form, setForm] = useState({
     name: "",
+    company: "",
+    actualPricePerPiece: "",
     pricePerPiece: "",
     piecesPerBox: "",
     stockBoxes: "",
@@ -13,37 +16,61 @@ export default function AdminProducts() {
   });
   const [image, setImage] = useState(null);
 
+  /* ================================
+     LOAD PRODUCTS
+  ================================ */
   const loadProducts = async () => {
     const res = await API.get("/products");
     setProducts(res.data);
   };
 
+  /* ================================
+     LOAD COMPANIES
+  ================================ */
+  const loadCompanies = async () => {
+    const res = await API.get("/companies");
+    setCompanies(res.data);
+  };
+
   useEffect(() => {
     loadProducts();
+    loadCompanies();
   }, []);
 
   /* ================================
-     ADD PRODUCT (WITH IMAGE)
+     ADD PRODUCT
   ================================ */
   const addProduct = async () => {
     try {
-      const formData = new FormData();
+      if (!form.company) {
+        alert("Please select a company");
+        return;
+      }
 
+      const formData = new FormData();
       formData.append("name", form.name);
+      formData.append("company", form.company);
       formData.append("pricePerPiece", form.pricePerPiece);
       formData.append("piecesPerBox", form.piecesPerBox);
       formData.append("stockBoxes", form.stockBoxes || 0);
       formData.append("stockPieces", form.stockPieces || 0);
 
+      // future-ready (backend will accept later)
+      formData.append(
+        "actualPricePerPiece",
+        form.actualPricePerPiece
+      );
+
       if (image) {
-        formData.append("image", image); // 🔑 MUST be "image"
+        formData.append("image", image);
       }
 
-      // ❌ DO NOT set Content-Type manually
       await API.post("/products", formData);
 
       setForm({
         name: "",
+        company: "",
+        actualPricePerPiece: "",
         pricePerPiece: "",
         piecesPerBox: "",
         stockBoxes: "",
@@ -59,7 +86,7 @@ export default function AdminProducts() {
   };
 
   /* ================================
-     UPDATE PRODUCT (PRICE / PCS)
+     UPDATE PRODUCT
   ================================ */
   const updateProduct = async (id, data) => {
     await API.put(`/products/${id}`, data);
@@ -82,15 +109,47 @@ export default function AdminProducts() {
 
       {/* ADD PRODUCT */}
       <div className="bg-white border rounded-md p-4 mb-6 grid md:grid-cols-4 gap-3">
+
         <input
-          placeholder="Name"
+          placeholder="Product Name"
           className="border p-2"
           value={form.name}
           onChange={e => setForm({ ...form, name: e.target.value })}
         />
 
+        {/* COMPANY DROPDOWN */}
+        <select
+          className="border p-2"
+          value={form.company}
+          onChange={e =>
+            setForm({ ...form, company: e.target.value })
+          }
+        >
+          <option value="">Select Company</option>
+          {companies.map(c => (
+            <option key={c._id} value={c._id}>
+              {c.name}
+            </option>
+          ))}
+        </select>
+
+        {/* ACTUAL PRICE */}
         <input
-          placeholder="₹ / piece"
+          placeholder="Actual ₹ / piece"
+          type="number"
+          className="border p-2"
+          value={form.actualPricePerPiece}
+          onChange={e =>
+            setForm({
+              ...form,
+              actualPricePerPiece: e.target.value
+            })
+          }
+        />
+
+        {/* SELLING PRICE */}
+        <input
+          placeholder="Selling ₹ / piece"
           type="number"
           className="border p-2"
           value={form.pricePerPiece}
@@ -150,6 +209,7 @@ export default function AdminProducts() {
           <thead className="bg-gray-50 text-sm">
             <tr>
               <th className="border-t px-3 py-2">Name</th>
+              <th className="border-t px-3 py-2">Company</th>
               <th className="border-t px-3 py-2">₹ / Piece</th>
               <th className="border-t px-3 py-2">Pcs / Box</th>
               <th className="border-t px-3 py-2">Box Price</th>
@@ -161,6 +221,10 @@ export default function AdminProducts() {
             {products.map(p => (
               <tr key={p._id}>
                 <td className="border-t px-3 py-2">{p.name}</td>
+
+                <td className="border-t px-3 py-2">
+                  {p.company?.name}
+                </td>
 
                 <td className="border-t px-3 py-2">
                   <input
@@ -193,11 +257,8 @@ export default function AdminProducts() {
                 </td>
 
                 <td className="border-t px-3 py-2 text-sm">
-                  <div className="mb-1">
-                    <strong>{p.stockBoxes}</strong> boxes
-                    <br />
-                    <strong>{p.stockPieces}</strong> pcs
-                  </div>
+                  <strong>{p.stockBoxes}</strong> boxes<br />
+                  <strong>{p.stockPieces}</strong> pcs
 
                   <div className="flex gap-2 mt-1">
                     <input

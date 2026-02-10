@@ -45,15 +45,25 @@ export const CartProvider = ({ children }) => {
   };
 
   // UPDATE QUANTITY FROM CART PAGE
-  const updateQty = (id, type, value) => {
-    setCart(prev =>
-      prev.map(c =>
-        c.product._id === id
-          ? { ...c, [type]: Math.max(0, Number(value)) }
-          : c
+const updateQty = (productId, field, value) => {
+  setCart(prev =>
+    prev
+      .map(item => {
+        if (item.product._id !== productId) {
+          return item;
+        }
+
+        return {
+          ...item,
+          [field]: value
+        };
+      })
+      // ✅ REMOVE ITEM WHEN BOTH ARE ZERO
+      .filter(
+        item => !(item.pieces === 0 && item.boxes === 0)
       )
-    );
-  };
+  );
+};
 
   // CLEAR CART
   const clearCart = () => {

@@ -1,32 +1,54 @@
 import { useEffect, useState, useContext } from "react";
+import { useParams } from "react-router-dom";
 import API from "../services/api";
 import { CartContext } from "../context/cart";
 import QuantitySelector from "../components/quantityselector";
 
-export default function Products() {
-  const [products, setProducts] = useState([]);
+export default function CompanyProducts() {
+  const { companyId } = useParams();
   const { cart, addToCart, updateQty } = useContext(CartContext);
 
-  useEffect(() => {
-    API.get("/products").then(res => setProducts(res.data));
-  }, []);
+  const [products, setProducts] = useState([]);
 
-  // Helper to get cart item for a product
+  useEffect(() => {
+    if (!companyId) return;
+
+    API.get(`/products/company/${companyId}`)
+      .then(res => setProducts(res.data))
+      .catch(err =>
+        console.error(
+          "Failed to load company products",
+          err.response?.data || err.message
+        )
+      );
+  }, [companyId]);
+
   const getCartItem = (productId) =>
     cart.find(c => c.product._id === productId);
 
+  if (!products.length) {
+    return (
+      <div className="p-6 text-center text-gray-500">
+        No products available for this company
+      </div>
+    );
+  }
+
   return (
-    <div
-      className="max-w-7xl mx-auto px-4 py-6
-      grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-6"
-    >
-      {products.map(p => {
+    <div className="max-w-7xl mx-auto px-4 py-6 grid grid-cols-2 md:grid-cols-4 gap-6">
+      {products.map(p => {console.log("PRICE CHECK", {
+  name: p.name,
+  actualPrice: p.actualPrice,
+  sellingPrice: p.pricePerPiece
+});
+
         const cartItem = getCartItem(p._id);
         const pieces = cartItem?.pieces || 0;
         const boxes = cartItem?.boxes || 0;
 
         const hasDiscount =
-          p.actualPrice && p.actualPrice > p.pricePerPiece;
+          p.actualPrice &&
+          p.actualPrice > p.pricePerPiece;
 
         const discountPercent = hasDiscount
           ? Math.round(
@@ -41,7 +63,6 @@ export default function Products() {
             key={p._id}
             className="bg-white border rounded-md p-4 flex flex-col"
           >
-            {/* IMAGE */}
             {p.image && (
               <img
                 src={p.image}
@@ -51,25 +72,26 @@ export default function Products() {
             )}
 
             <h2 className="font-bold text-lg">{p.name}</h2>
+            
+          {/* ACTUAL PRICE */}
+{hasDiscount && (
+  <p className="text-xs">
+    Actual Price: ₹{p.actualPrice} / piece
+  </p>
+)}
 
-            {/* ACTUAL PRICE */}
-            {hasDiscount && (
-              <p className="text-xs">
-                Actual Price: ₹{p.actualPrice} / piece
-              </p>
-            )}
+{/* SELLING PRICE */}
+<p className="text-sm font-semibold text-green-600">
+  Selling Price: ₹{p.pricePerPiece} / piece
+</p>
 
-            {/* SELLING PRICE */}
-            <p className="text-sm font-semibold text-green-600">
-              Selling Price: ₹{p.pricePerPiece} / piece
-            </p>
+{/* DISCOUNT */}
+{hasDiscount && (
+  <p className="text-xs text-green-700 font-medium">
+    {discountPercent}% OFF
+  </p>
+)}
 
-            {/* DISCOUNT */}
-            {hasDiscount && (
-              <p className="text-xs text-green-700 font-medium">
-                {discountPercent}% OFF
-              </p>
-            )}
 
             <p className="text-sm mt-1">
               {p.piecesPerBox} pcs / box

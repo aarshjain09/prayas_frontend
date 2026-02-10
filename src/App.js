@@ -9,15 +9,19 @@ import Register from "./pages/register";
 import Products from "./pages/products";
 import Cart from "./pages/cart";
 import Orders from "./pages/orders";
+import AdminCompanies from "./pages/admin/companies";
+
+// 🆕 NEW PAGES
+import Home from "./pages/home";
+import CompanyProducts from "./pages/companyp";
 
 import AdminDashboard from "./pages/admin/dashboard";
 import AdminProducts from "./pages/admin/products";
 import AdminOrders from "./pages/admin/orders";
+import AdminUsers from "./pages/admin/users";
 
 import { AuthProvider } from "./context/auth";
 import { CartProvider } from "./context/cart";
-import AdminUsers from "./pages/admin/users";
-
 
 export default function App() {
   return (
@@ -31,6 +35,26 @@ export default function App() {
             <Route path="/" element={<Login />} />
             <Route path="/register" element={<Register />} />
 
+            {/* 🏠 HOME – COMPANIES */}
+            <Route
+              path="/home"
+              element={
+                <ProtectedRoute>
+                  <Home />
+                </ProtectedRoute>
+              }
+            />
+
+            {/* 🏢 COMPANY PRODUCTS */}
+            <Route
+              path="/company/:companyId"
+              element={
+                <ProtectedRoute>
+                  <CompanyProducts />
+                </ProtectedRoute>
+              }
+            />
+
             {/* Customer (Protected) */}
             <Route
               path="/products"
@@ -40,14 +64,7 @@ export default function App() {
                 </ProtectedRoute>
               }
             />
-            <Route
-  path="/admin/users"
-  element={
-    <AdminRoute>
-      <AdminUsers />
-    </AdminRoute>
-  }
-/>
+
             <Route
               path="/cart"
               element={
@@ -67,6 +84,15 @@ export default function App() {
             />
 
             {/* Admin (Protected + Role-based) */}
+            <Route
+  path="/admin/companies"
+  element={
+    <AdminRoute>
+      <AdminCompanies />
+    </AdminRoute>
+  }
+/>
+
             <Route
               path="/admin"
               element={
@@ -90,6 +116,15 @@ export default function App() {
               element={
                 <AdminRoute>
                   <AdminOrders />
+                </AdminRoute>
+              }
+            />
+
+            <Route
+              path="/admin/users"
+              element={
+                <AdminRoute>
+                  <AdminUsers />
                 </AdminRoute>
               }
             />

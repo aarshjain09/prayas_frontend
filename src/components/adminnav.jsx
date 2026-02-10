@@ -11,17 +11,22 @@ export default function AdminNav() {
       <NavLink to="/admin" className={linkClass}>
         Dashboard
       </NavLink>
+
+      <NavLink to="/admin/companies" className={linkClass}>
+        Companies
+      </NavLink>
+
       <NavLink to="/admin/products" className={linkClass}>
         Products
       </NavLink>
+
       <NavLink to="/admin/orders" className={linkClass}>
         Orders
       </NavLink>
+
       <NavLink to="/admin/users" className={linkClass}>
         Users
       </NavLink>
-
-
     </div>
   );
 }
